@@ -48,6 +48,14 @@ J’édite et monétise des sites, j’accompagne des projets en SEO (on‑site,
 - Chaîne YouTube : [Maximilien Labadie - Web & SEO](https://www.youtube.com/c/MaximilienLabadie-WebandSEO)  
 - S’abonner à la [Newsletter Web & SEO](https://www.webandseo.net/)
 
+---
+
+## Liens utiles
+- [Linktree](https://linktr.ee/webseofr)
+- [Solo.to](https://solo.to/webandseo)  
+- [Bento.me](https://bento.me/webandseo)  
+- [CodePen](https://codepen.io/Maximilien-Labadie/full/ZYbxgzy)
+
 <!---
 webandseo/webandseo is a ✨ special ✨ repository because its `README.md` (this file) appears on your GitHub profile.
 You can click the Preview link to take a look at your changes.
