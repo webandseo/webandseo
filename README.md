@@ -2,7 +2,7 @@
 
 J’édite et monétise des sites, j’accompagne des projets en SEO (on‑site, contenu, netlinking) et je partage mes retours d’expérience via Web & SEO, une newsletter hebdomadaire et des ressources dédiées.
 
-![Maximilien Labadie - Web & SEO](https://cdn.webandseo.fr/wp-content/uploads/2020/12/DSC05931-scaled-e1609211679811.jpg)
+[![Maximilien Labadie - Web & SEO](https://cdn.webandseo.fr/wp-content/uploads/2020/12/DSC05931-scaled-e1609211679811.jpg)]
 
 ---
 
