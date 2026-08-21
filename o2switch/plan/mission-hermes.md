@@ -35,8 +35,8 @@ Trois points sont désormais établis, et ils simplifient beaucoup :
   côté — mais lis quand même le piège n° 3 plus bas, il en reste un.
 - **Un seul sous-domaine est concerné** : `blog.whiteref.com`. Voir la section
   dédiée, c'est le cas le plus délicat des 18.
-- **Un site passe par un CDN** : `je-dois-reussir.com` (KeyCDN). Section dédiée
-  également.
+- **Un site passe par un CDN** : `je-dois-reussir.com`, via le CNAME
+  `cdn.je-dois-reussir.com` (KeyCDN). Section dédiée également.
 
 Restent à établir, pour chacun des 18 sites : son poids, sa base, sa version de
 PHP, et si ses DNS sont gérés par o2switch ou ailleurs (Cloudflare, registrar).
@@ -216,14 +216,22 @@ Enfin `finaliser` sur chacun des trois, puis :
 
 ### `je-dois-reussir.com` — CDN KeyCDN
 
-Un enregistrement CNAME de la zone pointe vers `jedoisreussir-f692.kxcdn.com`.
-**Le nom exact de l'hôte est à confirmer dans le relevé DNS** (souvent
-`cdn.je-dois-reussir.com`) : `o2s-dns-save.sh` sonde désormais les CNAME et les
-sous-domaines déclarés, il le fera apparaître.
+La zone contient un CNAME :
 
-Ce CNAME vit dans la zone du domaine : il disparaît avec elle et **doit être
-ressaisi** sur `sc1webandseo`, sinon le CDN cesse de répondre alors que le site,
-lui, marche parfaitement — le genre de panne qu'on met une demi-journée à voir.
+    cdn.je-dois-reussir.com  ->  jedoisreussir-f692.kxcdn.com
+
+Il vit dans la zone du domaine, disparaît avec elle, et **doit être ressaisi**
+sur `sc1webandseo`. Sans lui, le CDN cesse de répondre alors que le site, lui,
+marche parfaitement — le genre de panne qu'on met une demi-journée à voir.
+
+> **`cdn` est un enregistrement DNS, pas un sous-domaine cPanel.** Il n'a pas
+> de racine web : rien à pré-copier, rien à créer dans `Domaines`. Il se
+> ressaisit uniquement dans l'**Éditeur de zone**, en CNAME.
+>
+> Le créer comme sous-domaine cPanel produirait un enregistrement A vers le
+> serveur, qui empêcherait le CNAME d'exister. Le site continuerait de
+> fonctionner, mais servirait ses fichiers depuis l'origine, CDN contourné —
+> sans rien casser de visible.
 
 Côté KeyCDN, rien à modifier : l'origine reste `je-dois-reussir.com` et l'IP du
 serveur ne change pas. Deux précautions quand même :
@@ -298,7 +306,6 @@ d'attention.
 ## À me remonter
 
 - Le `sites.tsv` de l'inventaire, **avant** la première migration
-- Le nom d'hôte exact du CNAME KeyCDN, relevé sur `je-dois-reussir.com`
 - Où sont implémentées les redirections de `whiteref.com`
 - Après le premier site : le temps réel, et ce qui a coincé
 - Après chaque site : la sortie de `o2s-verif.sh --snapshot apres`

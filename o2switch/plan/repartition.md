@@ -157,9 +157,10 @@ retenu conserve 5 sites dessus.
   contenu. Supprimer le domaine emporte ses sous-domaines : les trois partent
   ensemble vers `sc4webandseo`, ce qui est déjà la lune prévue — pas de
   conflit, mais trois racines à traiter.
-- **`je-dois-reussir.com` passe par KeyCDN**, via un CNAME vers
-  `jedoisreussir-f692.kxcdn.com`. Ce CNAME vit dans la zone du domaine et
-  disparaît avec elle : à ressaisir sur `sc1webandseo`.
+- **`je-dois-reussir.com` passe par KeyCDN** : `cdn.je-dois-reussir.com` est un
+  CNAME vers `jedoisreussir-f692.kxcdn.com`. Il vit dans la zone du domaine et
+  disparaît avec elle : à ressaisir sur `sc1webandseo`, dans l'Éditeur de zone
+  uniquement — c'est un alias DNS, pas un sous-domaine cPanel.
 - **Aucun autre sous-domaine** parmi les 18 sites à déplacer.
 
 ## Générer les commandes
