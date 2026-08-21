@@ -81,6 +81,7 @@ ORDRE
 
 awk -F',' -v filtre="$FILTRE" -v src="$SRC_DEFAUT" '
   function trim(s) { gsub(/^[ \t]+|[ \t]+$/, "", s); return s }
+  function nz(s)   { return (s == "") ? "~" : s }
   NR==1 { next }
   $1 ~ /^[[:space:]]*(#|$)/ { next }
   {
@@ -95,32 +96,64 @@ awk -F',' -v filtre="$FILTRE" -v src="$SRC_DEFAUT" '
     if (trim($9) != "") p += 50           # DNS gérés ailleurs
     p += (trim($11)+0) * 200              # valeur : les plus précieux en dernier
     p += int((trim($7)+0) / 500)          # taille, en paliers de 500 Mo
-    printf "%09d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n", p, dom, cible, src_user, trim($11), trim($12), trim($8), trim($9)
+    # La tabulation est un séparateur « blanc » : `read` fusionne les
+    # tabulations consécutives, donc une colonne vide décalerait toutes les
+    # suivantes. On émet une sentinelle, retirée côté shell.
+    printf "%09d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n", p, dom, cible, src_user,
+           nz(trim($11)), nz(trim($12)), nz(trim($8)), nz(trim($9)), nz(trim($10))
   }
-' "$CSV" | sort -n | while IFS=$'\t' read -r _ dom cible src val ris mails dns; do
+' "$CSV" | sort -n | while IFS=$'\t' read -r _ dom cible src val ris mails dns sous; do
+  for v in val ris mails dns sous; do
+    eval "[ \"\$$v\" = \"~\" ] && $v=\"\""
+  done
   printf '\n%s### %s  →  %s%s' "$C_D" "$dom" "$cible" "$C_RST"
   printf '   (valeur %s, risque %s' "${val:-?}" "${ris:-?}"
-  [ -n "$mails" ] && printf ', emails'
+  [ -n "$mails" ] && [ "$mails" != "non" ] && printf ', emails'
   [ -n "$dns" ]   && printf ', DNS externe'
+  [ -n "$sous" ]  && printf ', %s sous-domaine(s)' "$(printf '%s' "$sous" | wc -w | tr -d ' ')"
   printf ')\n'
-  cat <<CMD
 
-# --- la veille, sur $src (site en ligne, aucune coupure)
-./o2s-verif.sh  --domaine $dom --snapshot avant
-./o2s-migrer.sh --domaine $dom --dst-user $cible --phase precopy --go
+  # Un domaine qui porte des sous-domaines les emporte à la suppression : ils
+  # doivent être pré-copiés et recréés eux aussi, sinon ils disparaissent.
+  opt_sous=""; liste_sous=""
+  if [ -n "$sous" ]; then
+    liste_sous="$(printf '%s' "$sous" | tr ' ' ',')"
+    opt_sous=" --sous-domaines $liste_sous"
+  fi
 
-# --- jour J, sur $src
-./o2s-migrer.sh --domaine $dom --dst-user $cible --phase delta --gel --go
-#   cPanel $src   : Domaines > $dom > Supprimer
-#   cPanel $cible : Domaines > Créer un domaine > $dom, racine /home/$cible/$dom
-#   Éditeur de zone de $cible : ressaisir MX / SPF / DKIM / DMARC
-#   SSL/TLS Status de $cible  : Exécuter AutoSSL
+  printf '\n# --- la veille, sur %s (site en ligne, aucune coupure)\n' "$src"
+  printf './o2s-verif.sh  --domaine %s%s --snapshot avant\n' "$dom" "$opt_sous"
+  printf './o2s-migrer.sh --domaine %s --dst-user %s --phase precopy --go\n' "$dom" "$cible"
+  for sd in $sous; do
+    printf './o2s-migrer.sh --domaine %s.%s --dst-user %s --phase precopy --go\n' "$sd" "$dom" "$cible"
+  done
 
-# --- puis sur $cible
-./o2s-migrer.sh --domaine $dom --dst-user $cible --src-user $src \\
-                --phase finaliser --reecrire-chemins --go
-./o2s-verif.sh  --domaine $dom --snapshot apres
-CMD
-  [ -n "$mails" ] && printf '\n# Ce domaine porte des boîtes email : recréer les comptes sur %s,\n# puis transférer mail/%s et etc/%s.\n' "$cible" "$dom" "$dom"
+  printf '\n# --- jour J, sur %s\n' "$src"
+  printf './o2s-migrer.sh --domaine %s --dst-user %s --phase delta --gel --go\n' "$dom" "$cible"
+  for sd in $sous; do
+    printf './o2s-migrer.sh --domaine %s.%s --dst-user %s --phase delta --gel --go\n' "$sd" "$dom" "$cible"
+  done
+  printf '#   cPanel %s : Domaines > %s > Supprimer' "$src" "$dom"
+  [ -n "$sous" ] && printf '  (emporte %s)' "$liste_sous"
+  printf '\n'
+  printf '#   cPanel %s : Créer un domaine > %s, racine /home/%s/%s\n' "$cible" "$dom" "$cible" "$dom"
+  for sd in $sous; do
+    printf '#   cPanel %s : puis créer le sous-domaine %s.%s\n' "$cible" "$sd" "$dom"
+  done
+  printf '#   Éditeur de zone de %s : ressaisir MX / SPF / DKIM / DMARC / CNAME\n' "$cible"
+  printf '#   SSL/TLS Status de %s  : Exécuter AutoSSL' "$cible"
+  [ -n "$sous" ] && printf '  (vérifier la couverture des sous-domaines)'
+  printf '\n'
+
+  printf '\n# --- puis sur %s\n' "$cible"
+  printf './o2s-migrer.sh --domaine %s --dst-user %s --src-user %s \\\n' "$dom" "$cible" "$src"
+  printf '                --phase finaliser --reecrire-chemins --go\n'
+  for sd in $sous; do
+    printf './o2s-migrer.sh --domaine %s.%s --dst-user %s --src-user %s \\\n' "$sd" "$dom" "$cible" "$src"
+    printf '                --phase finaliser --reecrire-chemins --go\n'
+  done
+  printf './o2s-verif.sh  --domaine %s%s --snapshot apres\n' "$dom" "$opt_sous"
+
+  [ -n "$mails" ] && [ "$mails" != "non" ] && printf '\n# Ce domaine porte des boîtes email : recréer les comptes sur %s,\n# puis transférer mail/%s et etc/%s.\n' "$cible" "$dom" "$dom"
   [ -n "$dns" ]   && printf '\n# DNS gérés hors o2switch : rien à ressaisir dans l\x27Éditeur de zone,\n# mais vérifier que l\x27enregistrement A pointe bien vers le serveur.\n'
 done

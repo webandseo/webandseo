@@ -65,7 +65,16 @@ if command -v dig >/dev/null 2>&1; then
   [ -n "$NS" ] && log "serveur interrogé : $NS" || warn "aucun NS trouvé, on interroge le résolveur par défaut"
   AT="${NS:+@$NS}"
 
-  TYPES="SOA NS A AAAA MX TXT CAA"
+  # Les sous-domaines réellement déclarés dans cPanel sont ajoutés aux préfixes
+  # sondés : une liste figée laisserait passer un « annuaire » ou un « cdn »,
+  # et c'est précisément ce genre d'enregistrement qui disparaît sans bruit.
+  SUBS="$(uapi_json DomainInfo domains_data format=hash | o2s_json domains \
+    | awk -F'\t' -v suf=".$DOMAIN" '{ n=length(suf)
+        if (length($1) > n && substr($1, length($1)-n+1) == suf)
+          print substr($1, 1, length($1)-n) }' | sort -u | tr '\n' ' ')"
+  [ -n "$SUBS" ] && log "sous-domaines déclarés : $SUBS"
+
+  TYPES="SOA NS A AAAA MX TXT CAA CNAME"
   # Préfixes courants : services mail, sélecteurs DKIM des principaux
   # expéditeurs, sous-domaines habituels. Mieux vaut en interroger trop.
   PREFIXES="@ www mail smtp imap pop ftp cpanel webmail webdisk cpcalendars cpcontacts
@@ -75,7 +84,9 @@ if command -v dig >/dev/null 2>&1; then
             zoho._domainkey mandrill._domainkey sendgrid._domainkey brevo._domainkey
             mailjet._domainkey mj._domainkey pm._domainkey _acme-challenge _mta-sts
             _smtp._tls blog shop boutique app api dev staging preprod recette m cdn
-            img static assets news forum wiki docs admin portal client crm mail2 track"
+            img static assets news forum wiki docs admin portal client crm mail2 track
+            annuaire directory files media video download support aide help
+            $SUBS"
 
   {
     printf '; Relevé DNS de %s — %s\n' "$DOMAIN" "$(date)"

@@ -147,13 +147,20 @@ initiale.
 mis hors d'atteinte le compte depuis lequel se gèrent les lunes. Le choix
 retenu conserve 5 sites dessus.
 
-### Points à confirmer pendant l'inventaire
+### Particularités relevées
 
-- Aucun de ces 23 domaines ne doit avoir de **sous-domaine** dont la
-  répartition le séparerait de son domaine principal — c'est techniquement
-  impossible.
-- `whiteref.com` et `whiteref.net` sont regroupés sur `sc4webandseo`, ce qui
-  est cohérent s'ils relèvent du même projet.
+- **Aucune boîte email** sur les 23 domaines. Cela retire la partie la plus
+  pénible d'une migration cPanel. La zone DNS reste à restaurer intégralement :
+  MX, SPF et DKIM peuvent servir au courrier sortant des sites même sans boîte.
+- **`whiteref.com` est une famille de trois hôtes** : le domaine et
+  `annuaire.` redirigent vers `www.leblogmarketing.fr`, `blog.` porte le
+  contenu. Supprimer le domaine emporte ses sous-domaines : les trois partent
+  ensemble vers `sc4webandseo`, ce qui est déjà la lune prévue — pas de
+  conflit, mais trois racines à traiter.
+- **`je-dois-reussir.com` passe par KeyCDN**, via un CNAME vers
+  `jedoisreussir-f692.kxcdn.com`. Ce CNAME vit dans la zone du domaine et
+  disparaît avec elle : à ressaisir sur `sc1webandseo`.
+- **Aucun autre sous-domaine** parmi les 18 sites à déplacer.
 
 ## Générer les commandes
 

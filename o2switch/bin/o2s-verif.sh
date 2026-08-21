@@ -16,12 +16,13 @@ set -uo pipefail
 cd -- "$(dirname -- "$0")" || exit 1
 . ./o2s-lib.sh
 
-DOMAIN="" DOCROOT="" SNAP=""
+DOMAIN="" DOCROOT="" SNAP="" SOUS=""
 while [ $# -gt 0 ]; do
   case "$1" in
     --domaine|--domain) DOMAIN="${2:-}";  shift 2 ;;
     --docroot)          DOCROOT="${2:-}"; shift 2 ;;
     --snapshot)         SNAP="${2:-}";    shift 2 ;;
+    --sous-domaines)    SOUS="${2:-}";    shift 2 ;;
     -h|--help) sed -n '2,16p' "$0"; exit 0 ;;
     *) die "option inconnue : $1" ;;
   esac
@@ -67,6 +68,19 @@ releve() {
     printf 'dns_dmarc\t%s\n' "$(dig +short TXT "_dmarc.$DOMAIN" 2>/dev/null | tr '\n' ' ')"
   fi
 
+  # Sous-domaines et alias CDN : ils vivent dans la zone du domaine parent et
+  # disparaissent donc avec elle. Sans relevé nominatif, leur perte ne se voit
+  # pas — le domaine principal, lui, répond toujours.
+  if [ -n "$SOUS" ] && command -v dig >/dev/null 2>&1; then
+    for sd in $(printf '%s' "$SOUS" | tr ',' ' '); do
+      case "$sd" in *.*) fqdn="$sd" ;; *) fqdn="$sd.$DOMAIN" ;; esac
+      printf 'sous_a\t%s\t%s\n'     "$fqdn" "$(dig +short A     "$fqdn" 2>/dev/null | sort | tr '\n' ' ')"
+      printf 'sous_cname\t%s\t%s\n' "$fqdn" "$(dig +short CNAME "$fqdn" 2>/dev/null | sort | tr '\n' ' ')"
+      printf 'sous_http\t%s\t%s\n'  "$fqdn" "$(curl -sS -o /dev/null -m 25 -L \
+        -w '%{http_code} %{num_redirects} %{url_effective}' "https://$fqdn" 2>/dev/null || echo 'ERR 0 -')"
+    done
+  fi
+
   if [ -n "$DOCROOT" ] && [ -r "$DOCROOT/wp-config.php" ] && command -v wp >/dev/null 2>&1; then
     printf 'wp_siteurl\t%s\n' "$(cd "$DOCROOT" && wp option get siteurl --skip-plugins --skip-themes 2>/dev/null)"
     printf 'wp_home\t%s\n'    "$(cd "$DOCROOT" && wp option get home    --skip-plugins --skip-themes 2>/dev/null)"
@@ -91,8 +105,8 @@ if [ -n "$SNAP" ]; then
     # La clé d'une ligne « http » comprend l'URL testée, sans quoi les trois
     # mesures se confondraient.
     rapport=$(awk -F'\t' '
-      function k()        { return ($1=="http") ? $1 FS $2 : $1 }
-      function v(  i,s,d) { d=($1=="http")?3:2; s="";
+      function k()        { return ($1 ~ /^(http|sous_)/) ? $1 FS $2 : $1 }
+      function v(  i,s,d) { d=($1 ~ /^(http|sous_)/)?3:2; s="";
                             for(i=d;i<=NF;i++) s=s (i>d?" ":"") $i; return s }
       $1=="poids_ko"      { next }
       NR==FNR             { a[k()]=v(); next }
@@ -133,7 +147,7 @@ fi
 title "Contrôles — $DOMAIN"
 releve | while IFS=$'\t' read -r k a b; do
   case "$k" in
-    http)  code="${b%% *}"
+    http|sous_http)  code="${b%% *}"
            case "$code" in
              2*|3*) ok  "$a → $b" ;;
              *)     err "$a → $b" ;;

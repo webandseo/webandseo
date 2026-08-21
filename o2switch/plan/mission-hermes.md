@@ -29,10 +29,17 @@ remonte-le plutôt que de réorganiser.
 
 ## Étape 0 — inventaire, avant de toucher à quoi que ce soit
 
-Rien ne peut être planifié sérieusement sans savoir, pour chacun des 18 sites :
-son poids, sa base, sa version de PHP, s'il porte des **boîtes email**, s'il a
-des **sous-domaines**, et si ses DNS sont gérés par o2switch ou ailleurs
-(Cloudflare, registrar).
+Trois points sont désormais établis, et ils simplifient beaucoup :
+
+- **Aucun de ces 23 domaines n'héberge de boîte email.** Rien à migrer de ce
+  côté — mais lis quand même le piège n° 3 plus bas, il en reste un.
+- **Un seul sous-domaine est concerné** : `blog.whiteref.com`. Voir la section
+  dédiée, c'est le cas le plus délicat des 18.
+- **Un site passe par un CDN** : `je-dois-reussir.com` (KeyCDN). Section dédiée
+  également.
+
+Restent à établir, pour chacun des 18 sites : son poids, sa base, sa version de
+PHP, et si ses DNS sont gérés par o2switch ou ailleurs (Cloudflare, registrar).
 
 En SSH sur `webandseo` :
 
@@ -142,13 +149,96 @@ domaines en DNS externe.
 AutoSSL immédiatement après avoir ajouté le domaine. Si le site est derrière
 Cloudflare en mode proxy, passe-le en `DNS only` le temps de la validation.
 
-**3. Les emails ne se déplacent pas seuls.** Les comptes sont à recréer sur la
-lune, puis deux répertoires à transférer : `mail/SITE` (contenu des boîtes) et
-`etc/SITE` (configurations et mots de passe). Bascule à heure creuse : les
-messages entrants peuvent être rejetés pendant la fenêtre.
+**3. Les emails : aucune boîte, mais la zone reste à restaurer.** Il n'y a pas
+de boîte à migrer, donc rien à transférer. Attention au raccourci : l'absence
+de boîtes ne veut pas dire que la zone ne contient ni MX, ni SPF, ni DKIM, ni
+DMARC. Ces enregistrements servent au **courrier sortant** — formulaires de
+contact, notifications WordPress, mails transactionnels — et à la réputation du
+domaine. Ressaisis tout ce que le relevé montre, sans trier.
 
 **4. Un sous-domaine ne peut pas quitter son domaine principal.** Il reste sur
-la même lune, obligatoirement.
+la même lune, obligatoirement. Et surtout : **supprimer un domaine supprime
+tous ses sous-domaines avec lui.** C'est ce qui rend `whiteref.com` particulier.
+
+## Deux sites demandent un traitement particulier
+
+### `whiteref.com` — trois hôtes qui partent ensemble
+
+Ce n'est pas un site mais une famille :
+
+| Hôte | Rôle |
+|---|---|
+| `whiteref.com` et `www.whiteref.com` | redirection vers `https://www.leblogmarketing.fr` |
+| `annuaire.whiteref.com` | redirection vers `https://www.leblogmarketing.fr` |
+| `blog.whiteref.com` | le contenu réel |
+
+**Supprimer `whiteref.com` du compte principal supprime aussi les deux
+sous-domaines.** Les trois partent donc dans le même mouvement — vers
+`sc4webandseo`, ce qui est déjà la lune prévue. Aucun conflit, mais trois
+racines à pré-copier au lieu d'une.
+
+**Avant tout : repère où sont implémentées les redirections.** Créées dans
+cPanel → `Redirections`, elles sont stockées dans le compte et **ne suivront
+pas** : à recréer à l'identique sur `sc4webandseo`. Écrites dans un
+`.htaccess`, elles voyagent avec les fichiers. Vérifie avant, pas après.
+
+Déroulé :
+
+    # relevé DNS : une seule fois, sur le domaine parent — il sonde les sous-domaines
+    ./o2s-dns-save.sh --domaine whiteref.com
+    ./o2s-verif.sh --domaine whiteref.com --sous-domaines blog,annuaire --snapshot avant
+
+    # pré-copie : un appel par hôte. Ajoute --no-wp sur ceux qui ne portent
+    # qu'une redirection, ils n'ont ni WordPress ni base.
+    ./o2s-migrer.sh --domaine whiteref.com          --dst-user sc4webandseo --phase precopy --go
+    ./o2s-migrer.sh --domaine blog.whiteref.com     --dst-user sc4webandseo --phase precopy --go
+    ./o2s-migrer.sh --domaine annuaire.whiteref.com --dst-user sc4webandseo --phase precopy --go
+
+    # delta sur les trois, juste avant la bascule
+    ./o2s-migrer.sh --domaine whiteref.com          --dst-user sc4webandseo --phase delta --gel --go
+    ./o2s-migrer.sh --domaine blog.whiteref.com     --dst-user sc4webandseo --phase delta --gel --go
+    ./o2s-migrer.sh --domaine annuaire.whiteref.com --dst-user sc4webandseo --phase delta --gel --go
+
+Puis dans cPanel, **dans cet ordre** :
+
+1. `webandseo` → supprimer `whiteref.com` (les sous-domaines partent avec)
+2. `sc4webandseo` → créer le domaine `whiteref.com` **d'abord**
+3. `sc4webandseo` → créer ensuite les sous-domaines `blog` et `annuaire`, avec
+   les racines annoncées par les pré-copies
+4. Recréer les redirections si elles étaient côté cPanel
+5. Éditeur de zone : ressaisir le relevé
+6. AutoSSL : vérifier qu'il couvre les **quatre** hôtes — `whiteref.com`,
+   `www`, `blog`, `annuaire`
+
+Enfin `finaliser` sur chacun des trois, puis :
+
+    ./o2s-verif.sh --domaine whiteref.com --sous-domaines blog,annuaire --snapshot apres
+
+### `je-dois-reussir.com` — CDN KeyCDN
+
+Un enregistrement CNAME de la zone pointe vers `jedoisreussir-f692.kxcdn.com`.
+**Le nom exact de l'hôte est à confirmer dans le relevé DNS** (souvent
+`cdn.je-dois-reussir.com`) : `o2s-dns-save.sh` sonde désormais les CNAME et les
+sous-domaines déclarés, il le fera apparaître.
+
+Ce CNAME vit dans la zone du domaine : il disparaît avec elle et **doit être
+ressaisi** sur `sc1webandseo`, sinon le CDN cesse de répondre alors que le site,
+lui, marche parfaitement — le genre de panne qu'on met une demi-journée à voir.
+
+Côté KeyCDN, rien à modifier : l'origine reste `je-dois-reussir.com` et l'IP du
+serveur ne change pas. Deux précautions quand même :
+
+- **Purge la zone KeyCDN juste après la bascule.** Le mode maintenance de
+  `--gel` renvoie un 503, qu'un CDN ne met normalement pas en cache — mais une
+  page de maintenance figée dans un cache est le genre d'incident qu'on préfère
+  éviter que diagnostiquer.
+- Entre la suppression et la recréation du domaine, l'origine n'a plus
+  d'enregistrement A. Un *pull* du CDN pendant cette fenêtre peut échouer.
+  Raison de plus pour enchaîner les deux clics sans traîner.
+
+Relevés avant et après avec le nom d'hôte du CDN :
+
+    ./o2s-verif.sh --domaine je-dois-reussir.com --sous-domaines cdn --snapshot avant
 
 ## Règles de sûreté
 
@@ -166,14 +256,15 @@ la même lune, obligatoirement.
 
 ## Ordre d'exécution
 
-1. **Un seul site d'abord**, le plus léger sans email ni DNS externe d'après
-   l'inventaire. Il valide la clé SSH, la bascule, AutoSSL, et donne le vrai
-   chronomètre. Compte une heure. **Arrête-toi là et fais un point.**
-2. Ensuite les autres sites sans email ni DNS externe, du plus léger au plus
-   lourd. 15 à 20 minutes chacun une fois la procédure rodée.
-3. Puis ceux qui portent des emails ou une zone DNS chargée, un ou deux par
-   jour, avec un contrôle le lendemain.
-4. Les plus visités en dernier, à heure creuse.
+1. **Un seul site d'abord**, le plus léger d'après l'inventaire, en évitant
+   `whiteref.com` et `je-dois-reussir.com`. Il valide la clé SSH, la bascule,
+   AutoSSL, et donne le vrai chronomètre. Compte une heure.
+   **Arrête-toi là et fais un point.**
+2. Ensuite les 15 sites ordinaires, du plus léger au plus lourd. 15 à
+   20 minutes chacun une fois la procédure rodée.
+3. Puis `je-dois-reussir.com`, avec la purge KeyCDN.
+4. **`whiteref.com` en dernier**, à heure creuse : c'est le seul cas à trois
+   hôtes, et le seul où une erreur d'ordre dans cPanel coûte cher.
 
 N'enchaîne pas les 18 d'un bloc. Chaque bascule mérite ses quinze minutes
 d'attention.
@@ -187,10 +278,13 @@ d'attention.
 
 ## Quand t'arrêter et demander
 
-- Un site a des **sous-domaines** dont la répartition prévue les sépare du
-  domaine principal : techniquement impossible, remonte-le.
-- Un site porte des **boîtes email** avec un historique à conserver : confirme
-  la fenêtre de bascule avant de lancer.
+- L'inventaire révèle un **sous-domaine** ailleurs que sur `whiteref.com` : la
+  répartition n'en tient pas compte, remonte-le avant de déplacer le domaine
+  parent.
+- L'inventaire révèle une **boîte email** quelque part : cela contredit ce qui
+  a été annoncé, arrête-toi.
+- Les redirections de `whiteref.com` ne sont **ni dans cPanel ni dans un
+  `.htaccess`** (plugin WordPress, ou autre) : dis-le avant de basculer.
 - L'inventaire révèle un **site nettement plus gros ou plus sensible** que les
   autres (boutique, paiement, comptes utilisateurs) : la répartition a été
   faite par ordre alphabétique, sans critère de risque. Signale-le avant de le
@@ -204,6 +298,8 @@ d'attention.
 ## À me remonter
 
 - Le `sites.tsv` de l'inventaire, **avant** la première migration
+- Le nom d'hôte exact du CNAME KeyCDN, relevé sur `je-dois-reussir.com`
+- Où sont implémentées les redirections de `whiteref.com`
 - Après le premier site : le temps réel, et ce qui a coincé
 - Après chaque site : la sortie de `o2s-verif.sh --snapshot apres`
 - Un point global une fois les 18 faits, avec ce qui reste à finir
