@@ -116,6 +116,13 @@ répartir les sites.
    ./o2s-migrer.sh --domaine exemple.fr --dst-user lune2 --phase check
    ```
 
+   Les scripts visent `localhost` par défaut, puisque les lunes partagent le
+   serveur. Si la connexion est refusée alors que la clé est bien autorisée,
+   le shell cloisonné n'accepte peut-être pas ce nom : essayez
+   `ssh lune2@canard.o2switch.net`, et si c'est cette forme qui répond,
+   ajoutez `--dst-host canard.o2switch.net` à chaque commande. Le transfert
+   reste interne au serveur dans les deux cas.
+
 ---
 
 ## Procédure, site par site

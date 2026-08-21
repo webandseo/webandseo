@@ -159,6 +159,18 @@ phase_check() {
     4) Retestez :
          ./o2s-migrer.sh --domaine $DOMAIN --dst-user $DST_USER --phase check
 
+  Si la connexion échoue alors que la clé est bien autorisée, le shell
+  cloisonné refuse peut-être « localhost ». Refaites l'essai en nommant le
+  serveur explicitement :
+
+         ssh $DST_USER@$(hostname -f 2>/dev/null || echo canard.o2switch.net)
+
+  Si c'est cette variante qui répond, ajoutez à chaque commande :
+         --dst-host $(hostname -f 2>/dev/null || echo canard.o2switch.net)
+
+  Le transfert reste interne au serveur dans les deux cas : c'est la même
+  machine, seul le nom utilisé pour l'atteindre change.
+
 BOOTSTRAP
     return 1
   fi
