@@ -222,6 +222,8 @@ fonctionnement normal, une fois les emails et les tâches planifiées vérifiés
 | `o2s-migrer.sh` | Le cœur : `check`, `precopy`, `delta`, `finaliser`. |
 | `o2s-verif.sh` | Relevé `avant` / `apres` et comparaison. Détecte les régressions invisibles à l'œil. |
 | `o2s-plan.sh` | Tire les commandes de chaque site depuis `plan/inventaire.csv`, dans l'ordre de passage, et contrôle la cohérence du plan. |
+
+L'ordre de mission remis à l'exécutant se trouve dans `plan/mission-hermes.md`.
 | `o2s-lib.sh`, `o2s-json.php`, `o2s-wpcfg.php` | Fonctions communes, lecture des réponses de l'API cPanel et des `wp-config.php`. |
 
 Chaque script accepte `--help`.

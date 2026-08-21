@@ -43,15 +43,20 @@ awk -F',' -v OFS=' ' '
     gsub(/^[ \t]+|[ \t]+$/, "", cible); gsub(/^[ \t]+|[ \t]+$/, "", dom)
     if (dom=="") next
     total++
+    actuelle=$2; gsub(/^[ \t]+|[ \t]+$/, "", actuelle)
     if (cible=="") { sans[++ns]=dom; next }
     n[cible]++; sites[cible]=sites[cible] " " dom
+    if (cible == actuelle) { immobiles[++ni]=dom; next }
+    bouge++
     if (ris>=3) risque3[cible]=risque3[cible] " " dom
     if (val>=3) valeur3[cible]=valeur3[cible] " " dom
     if (val==0) sansnote[++nn]=dom
   }
   END {
-    printf "  %d site(s) dans la feuille\n", total
+    printf "  %d site(s) dans la feuille, %d à déplacer\n", total, bouge+0
     for (l in n) printf "  %-16s %d site(s) :%s\n", l, n[l], sites[l]
+    if (ni) { printf "\n  Déjà au bon endroit, aucune action (%d) :", ni
+              for(i=1;i<=ni;i++) printf " %s", immobiles[i]; print "" }
     if (ns) { printf "\n  Sans lune cible (%d) :", ns; for(i=1;i<=ns;i++) printf " %s", sans[i]; print "" }
     if (nn) { printf "  Sans note de valeur (%d) :", nn; for(i=1;i<=nn;i++) printf " %s", sansnote[i]; print "" }
 
@@ -81,8 +86,9 @@ awk -F',' -v filtre="$FILTRE" -v src="$SRC_DEFAUT" '
   {
     dom=trim($1); cible=trim($13)
     if (dom=="" || cible=="") next
-    if (filtre != "" && cible != filtre) next
     src_user = (trim($2)=="" ? src : trim($2))
+    if (cible == src_user) next          # ne bouge pas
+    if (filtre != "" && cible != filtre) next
     # Priorité de passage : simple et léger avant complexe et lourd.
     p = 0
     if (trim($8) != "") p += 100          # porte des emails

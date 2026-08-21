@@ -117,30 +117,43 @@ sa lune avec un site noté valeur 3.** Tout le reste est du remplissage.
 
 ---
 
-## Trame de répartition
+## Répartition retenue
 
-Structure proposée, à confirmer. Seuls les sites identifiables depuis vos
-pages publiques sont préremplis — les 17 autres manquent.
+Arrêtée par Maximilien. 23 sites, dont **18 à déplacer**.
 
-| Lune | Intention | Sites | Nb |
-|---|---|---|---|
-| `webandseo` | **Vidé.** Aucun site. | — | 0 |
-| `sc1webandseo` | Les deux actifs à plus forte valeur, groupe volontairement restreint | `webandseo.fr`, `seopepper.com` | 2 |
-| `sc2webandseo` | Marques, services, perso | `monsitedeniche.com`, `impactmarketing.fr`, `webandseo.net`, `maximilien.me` | 4 |
-| `sc3webandseo` | Sites de niche — lot A | *à compléter* | ~8 |
-| `sc4webandseo` | Sites de niche — lot B | *à compléter* | ~9 |
+| Compte | Sites | Nb |
+|---|---|---|
+| `webandseo` *(principal)* | `123loterie.com`, `despras.fr`, `domaine-chignard.fr`, `entretienauto.fr`, `etudiantenfrance.com` | 5, en place |
+| `sc1webandseo` | `guideregime.com`, `je-dois-reussir.com`, `jeanlouismahe.com`, `kolectou.com`, `leblogweb.fr` | 5 |
+| `sc2webandseo` | `ma-moto.net`, `ma-voiture.net`, `melimarie.fr`, `meuble.org` | 4 |
+| `sc3webandseo` | `plateaubriard.fr`, `prorecyclage.com`, `top-maison.net`, `tresorsinutiles.com` | 4 |
+| `sc4webandseo` | `troizenfants.fr`, `valdissole.fr`, `whiteref.com`, `whiteref.net`, `yves-simon.com` | 5 |
 
-Le raisonnement tient en une phrase : **les 17 sites de niche portent
-l'essentiel du risque et le moins de valeur unitaire.** Les concentrer sur
-deux lunes met tout le reste à l'abri, pour un effort identique.
+### Deux écarts assumés par rapport aux critères ci-dessus
 
-Deux points à vérifier avant de figer :
+**Le découpage est alphabétique.** `123loterie` → `etudiantenfrance`, puis
+`guideregime` → `leblogweb`, et ainsi de suite. Les notes de valeur et de
+risque n'ont donc pas été appliquées : chaque lune réunit des sites dont le
+seul point commun est l'initiale. Concrètement, si l'un de ces 23 sites pèse
+nettement plus que les autres, il partage aujourd'hui sa lune avec quatre
+voisins tirés au sort par l'alphabet.
 
-- `webandseo.fr/agence/`, `/academie/`, `/academie/produit/…` sont des
-  **sous-répertoires** : même installation, donc même lune — ce n'est pas un
-  choix. À confirmer qu'il ne s'agit pas d'installations distinctes.
-- Si l'un de ces domaines porte des **sous-domaines**, ceux-ci sont
-  indissociables du domaine principal et suivent forcément.
+Un découpage alphabétique divise malgré tout le périmètre exposé par cinq :
+c'est l'essentiel du gain, et il est acquis. Affiner reste possible plus tard,
+un déplacement de lune à lune coûtant le même effort qu'une migration
+initiale.
+
+**Cinq sites restent sur le compte principal.** Le vider entièrement aurait
+mis hors d'atteinte le compte depuis lequel se gèrent les lunes. Le choix
+retenu conserve 5 sites dessus.
+
+### Points à confirmer pendant l'inventaire
+
+- Aucun de ces 23 domaines ne doit avoir de **sous-domaine** dont la
+  répartition le séparerait de son domaine principal — c'est techniquement
+  impossible.
+- `whiteref.com` et `whiteref.net` sont regroupés sur `sc4webandseo`, ce qui
+  est cohérent s'ils relèvent du même projet.
 
 ## Générer les commandes
 
@@ -166,22 +179,14 @@ la lune cible.
 
 ---
 
-## Ce qu'il me manque pour finaliser
+## Suite
 
-1. **La liste des 23 domaines** — un simple copier-coller de la colonne
-   « Domaines » du cPanel de `webandseo` suffit. Le `sites.tsv` de l'inventaire
-   est encore mieux : il apporte tailles, versions de PHP et bases en une fois.
-   C'est le seul élément vraiment bloquant.
-2. **Le nombre de lunes que le plan autorise** (4, 8 ou 16 gratuites ?) —
-   quatre sont actives, mais rien ne dit que c'est le maximum. Visible dans
-   Mon Univers Web.
-3. **Le vrai nom de la lune 1** (`sc1webandseo` ?).
-4. **Les sites qui portent des boîtes email**, et ceux qui utilisent des DNS
-   externes (Cloudflare ou registrar) plutôt que ceux d'o2switch — ces deux
-   points changent la procédure de bascule, pas la répartition.
-5. **Les sites accessibles à un tiers**, s'il y en a.
-6. Pour les sites de niche, une indication grossière suffit : lesquels
-   génèrent des revenus, lesquels sont expérimentaux.
+La répartition est transmise à l'agent Hermes pour exécution :
+voir `plan/mission-hermes.md`.
 
-Avec ces éléments, la répartition se finalise et chaque site reçoit sa
-commande de migration, prête à copier-coller.
+Reste à établir pendant l'inventaire, avant la première migration : quels
+sites portent des boîtes email, lesquels utilisent des DNS externes, et
+lesquels ont des sous-domaines. Ces trois points changent la procédure de
+bascule, pas la répartition.
+
+Le nom de la lune 1 (`sc1webandseo`) est confirmé.
