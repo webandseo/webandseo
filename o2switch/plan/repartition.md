@@ -31,30 +31,53 @@ ne l'est :
 
 ---
 
-## D'abord : cinq lunes, est-ce le bon nombre ?
+## Les espaces disponibles
 
-23 sites pour 5 lunes, c'est 4,6 sites par lune — et donc l'impossibilité
-d'isoler seul le moindre site à enjeu. Or c'est précisément là que le
-cloisonnement rapporte le plus : un site qui pèse dans le chiffre d'affaires
-gagne à ne partager sa lune avec rien.
+| Compte cPanel | Rôle |
+|---|---|
+| `webandseo` | Compte principal — c'est de lui que se gèrent les lunes |
+| `sc1webandseo` | Lune 1 |
+| `sc2webandseo` | Lune 2 |
+| `sc3webandseo` | Lune 3 |
+| `sc4webandseo` | Lune 4 |
 
-Les offres o2switch ouvrent **4, 8 ou 16 lunes gratuites** selon le plan, et
-jusqu'à 20 en option payante (de l'ordre de 1,50 € par lune supplémentaire).
-**Vérifiez ce que votre plan autorise avant de figer la répartition.** Passer
-de 5 à 8 lunes change la nature de l'exercice :
+> Le nom de la lune 1 est à confirmer : la liste transmise indiquait
+> `sc2webandseo` pour les lunes 1 et 2. `sc1webandseo` est retenu par
+> cohérence avec `sc2` / `sc3` / `sc4`.
 
-| | 5 lunes | 8 lunes |
+**Quatre lunes, pas cinq espaces équivalents.** Le compte principal n'est pas
+une lune parmi d'autres : c'est celui depuis lequel les lunes se créent et se
+gèrent. Y héberger des sites revient à garder le point le plus sensible de
+l'installation exposé au risque qu'on cherche précisément à cloisonner.
+
+**Le mieux qu'on puisse en faire est de le vider complètement.** Il ne reste
+alors plus rien à compromettre là où ça ferait le plus de dégâts. Cela donne :
+
+| | 23 sites sur 5 espaces | 23 sites sur 4 lunes, principal vide |
 |---|---|---|
-| Sites par lune | 4 à 5 partout | 1 pour les sites critiques, 5 à 6 pour les autres |
-| Sites à enjeu isolés seuls | aucun | 3 |
-| Périmètre exposé si un site de niche tombe | 4 autres sites | 5 autres sites, tous sans enjeu |
+| Sites par espace | 4 à 5 | 5 à 6 |
+| Compte principal exposé | oui | **non** |
+| Périmètre si un site de niche tombe | 4 autres sites | 5 autres sites, sans enjeu |
 
-Le gain ne vient pas du nombre de lunes en soi : il vient de la possibilité de
-mettre les sites qui comptent **tout seuls**. Si le plan ne permet que 5 lunes
-et que l'option payante n'est pas souhaitée, la répartition ci-dessous reste
-valable — elle privilégie alors l'isolement du groupe le plus fragile.
+Un site de plus par lune contre un compte principal hors d'atteinte : le
+compte est largement favorable.
 
----
+### Vaut-il la peine d'ouvrir plus de lunes ?
+
+Quatre lunes sont *actives*, ce qui ne dit pas combien le plan en autorise.
+Les offres o2switch en ouvrent **4, 8 ou 16 gratuites** selon le plan, et
+jusqu'à 20 en option payante (de l'ordre de 1,50 € par lune). À vérifier dans
+Mon Univers Web.
+
+L'intérêt n'est pas d'avoir plus de lunes pour elles-mêmes : c'est de pouvoir
+mettre **seuls** les sites qui comptent. Avec quatre lunes, `webandseo.fr` et
+`seopepper.com` partagent forcément leur espace. Avec huit, chacun a le sien,
+et les sites de niche — les plus risqués, les moins critiques — se concentrent
+ailleurs sans mettre quoi que ce soit d'autre en jeu.
+
+Si le plan n'autorise que quatre lunes, la répartition ci-dessous reste
+valable : elle isole alors le groupe le plus fragile, ce qui est le meilleur
+usage possible de quatre espaces.
 
 ## Critères de classement
 
@@ -96,30 +119,42 @@ sa lune avec un site noté valeur 3.** Tout le reste est du remplissage.
 
 ## Trame de répartition
 
-Les intitulés ci-dessous sont une proposition de structure, pas une
-affectation. Seuls les sites identifiables depuis vos pages publiques sont
-préremplis, à titre d'exemple de raisonnement — ils sont à confirmer.
+Structure proposée, à confirmer. Seuls les sites identifiables depuis vos
+pages publiques sont préremplis — les 17 autres manquent.
 
-| Lune | Intention | Sites | Valeur | Risque |
-|---|---|---|---|---|
-| **lune-1** | Actif principal, isolé autant que possible | `webandseo.fr` *(+ sous-domaines éventuels)* | 3 | ? |
-| **lune-2** | Marques et services commerciaux | `seopepper.com`, `monsitedeniche.com`, `impactmarketing.fr` | 3 | ? |
-| **lune-3** | Perso, newsletter, annexes | `maximilien.me`, `webandseo.net` | 2 | ? |
-| **lune-4** | Sites de niche — lot A | *à compléter* | 1–2 | 2–3 |
-| **lune-5** | Sites de niche — lot B, et bac à sable | *à compléter* | 1 | 3 |
+| Lune | Intention | Sites | Nb |
+|---|---|---|---|
+| `webandseo` | **Vidé.** Aucun site. | — | 0 |
+| `sc1webandseo` | Les deux actifs à plus forte valeur, groupe volontairement restreint | `webandseo.fr`, `seopepper.com` | 2 |
+| `sc2webandseo` | Marques, services, perso | `monsitedeniche.com`, `impactmarketing.fr`, `webandseo.net`, `maximilien.me` | 4 |
+| `sc3webandseo` | Sites de niche — lot A | *à compléter* | ~8 |
+| `sc4webandseo` | Sites de niche — lot B | *à compléter* | ~9 |
 
-Deux remarques sur cette trame :
+Le raisonnement tient en une phrase : **les 17 sites de niche portent
+l'essentiel du risque et le moins de valeur unitaire.** Les concentrer sur
+deux lunes met tout le reste à l'abri, pour un effort identique.
+
+Deux points à vérifier avant de figer :
 
 - `webandseo.fr/agence/`, `/academie/`, `/academie/produit/…` sont des
-  **sous-répertoires** : même installation, donc même lune, ce n'est pas un
-  choix mais un fait. À confirmer qu'il ne s'agit pas d'installations
-  distinctes.
-- Les sites de niche sont ceux qui présentent le plus de risque (thèmes et
-  extensions variés, maintenance moins suivie) et le moins de valeur unitaire.
-  Les concentrer sur deux lunes protège tout le reste : c'est le meilleur
-  rapport effort/protection de l'ensemble.
+  **sous-répertoires** : même installation, donc même lune — ce n'est pas un
+  choix. À confirmer qu'il ne s'agit pas d'installations distinctes.
+- Si l'un de ces domaines porte des **sous-domaines**, ceux-ci sont
+  indissociables du domaine principal et suivent forcément.
 
----
+## Générer les commandes
+
+Une fois `inventaire.csv` rempli, `bin/o2s-plan.sh` en tire les commandes de
+chaque site, dans l'ordre de passage conseillé :
+
+```sh
+./o2s-plan.sh --csv ../plan/inventaire.csv                  # tout
+./o2s-plan.sh --csv ../plan/inventaire.csv --lune sc3webandseo   # une lune
+```
+
+Il contrôle aussi la cohérence du plan et signale les regroupements
+dangereux — un site noté risque 3 partageant sa lune avec un site noté
+valeur 3 — ainsi que les sites encore sans lune cible.
 
 ## Feuille d'inventaire
 
@@ -134,15 +169,18 @@ la lune cible.
 ## Ce qu'il me manque pour finaliser
 
 1. **La liste des 23 domaines** — un simple copier-coller de la colonne
-   « Domaines » du cPanel suffit. Le `sites.tsv` de l'inventaire est encore
-   mieux : il apporte tailles, versions de PHP et bases en une fois.
-2. **Le nombre de lunes réellement disponibles** sur votre plan (4, 8 ou 16
-   gratuites ?), pour savoir si on vise 5 ou davantage.
-3. **Les sites qui portent des boîtes email**, et ceux qui utilisent des DNS
+   « Domaines » du cPanel de `webandseo` suffit. Le `sites.tsv` de l'inventaire
+   est encore mieux : il apporte tailles, versions de PHP et bases en une fois.
+   C'est le seul élément vraiment bloquant.
+2. **Le nombre de lunes que le plan autorise** (4, 8 ou 16 gratuites ?) —
+   quatre sont actives, mais rien ne dit que c'est le maximum. Visible dans
+   Mon Univers Web.
+3. **Le vrai nom de la lune 1** (`sc1webandseo` ?).
+4. **Les sites qui portent des boîtes email**, et ceux qui utilisent des DNS
    externes (Cloudflare ou registrar) plutôt que ceux d'o2switch — ces deux
    points changent la procédure de bascule, pas la répartition.
-4. **Les sites accessibles à un tiers**, s'il y en a.
-5. Pour les sites de niche, une indication grossière suffit : lesquels
+5. **Les sites accessibles à un tiers**, s'il y en a.
+6. Pour les sites de niche, une indication grossière suffit : lesquels
    génèrent des revenus, lesquels sont expérimentaux.
 
 Avec ces éléments, la répartition se finalise et chaque site reçoit sa

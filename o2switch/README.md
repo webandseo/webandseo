@@ -221,6 +221,7 @@ fonctionnement normal, une fois les emails et les tâches planifiées vérifiés
 | `o2s-dns-save.sh` | Relève la zone DNS d'un domaine avant de le retirer. Trois sources, de la plus fidèle à la plus approximative. |
 | `o2s-migrer.sh` | Le cœur : `check`, `precopy`, `delta`, `finaliser`. |
 | `o2s-verif.sh` | Relevé `avant` / `apres` et comparaison. Détecte les régressions invisibles à l'œil. |
+| `o2s-plan.sh` | Tire les commandes de chaque site depuis `plan/inventaire.csv`, dans l'ordre de passage, et contrôle la cohérence du plan. |
 | `o2s-lib.sh`, `o2s-json.php`, `o2s-wpcfg.php` | Fonctions communes, lecture des réponses de l'API cPanel et des `wp-config.php`. |
 
 Chaque script accepte `--help`.

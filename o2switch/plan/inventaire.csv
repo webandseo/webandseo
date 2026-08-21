@@ -1,7 +1,11 @@
 domaine,lune_actuelle,racine_web,cms,base_de_donnees,php,taille_mo,emails,dns_externe,sous_domaines,valeur_1_3,risque_1_3,lune_cible,notes
-webandseo.fr,principal,,wordpress,,,,,,,3,,lune-1,
-webandseo.net,principal,,,,,,,,,2,,lune-3,newsletter
-seopepper.com,principal,,wordpress,,,,,,,3,,lune-2,
-monsitedeniche.com,principal,,wordpress,,,,,,,3,,lune-2,
-impactmarketing.fr,principal,,wordpress,,,,,,,2,,lune-2,
-maximilien.me,principal,,wordpress,,,,,,,2,,lune-3,
+webandseo.fr,webandseo,,wordpress,,,,,,,3,,sc1webandseo,actif principal
+seopepper.com,webandseo,,wordpress,,,,,,,3,,sc1webandseo,agence netlinking
+monsitedeniche.com,webandseo,,wordpress,,,,,,,3,,sc2webandseo,
+impactmarketing.fr,webandseo,,wordpress,,,,,,,2,,sc2webandseo,
+webandseo.net,webandseo,,,,,,,,,2,,sc2webandseo,newsletter
+maximilien.me,webandseo,,wordpress,,,,,,,2,,sc2webandseo,blog perso
+# --- les 17 lignes suivantes sont à remplir avec vos sites de niche ---
+# niche-01.fr,webandseo,,wordpress,,,,,,,1,3,sc3webandseo,
+# niche-02.fr,webandseo,,wordpress,,,,,,,1,3,sc3webandseo,
+# niche-03.fr,webandseo,,wordpress,,,,,,,1,3,sc4webandseo,
