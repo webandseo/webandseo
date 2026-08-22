@@ -3,13 +3,16 @@
 # o2s-plan.sh — transforme la feuille de répartition en commandes prêtes à
 # copier-coller, et contrôle la cohérence du plan avant qu'on y touche.
 #
-#   ./o2s-plan.sh --csv ../plan/inventaire.csv
-#   ./o2s-plan.sh --csv ../plan/inventaire.csv --lune sc1webandseo
+#   ./o2s-plan.sh --csv ../plan/webandseo/inventaire.csv
+#   ./o2s-plan.sh --csv ../plan/qvle6290/inventaire.csv --lune sc1qvle6290
+#
+# --csv est obligatoire : plusieurs hébergements sont décrits dans plan/, et
+# se tromper de feuille produirait des commandes visant les mauvais comptes.
 #
 # Sur 23 sites, le risque n'est pas de rater une commande : c'est d'en taper
 # une avec le mauvais nom de lune. Autant les générer.
 #
-# Colonnes attendues (voir plan/inventaire.csv) :
+# Colonnes attendues (voir une feuille de plan/<compte>/inventaire.csv) :
 #   1 domaine  2 lune_actuelle  3 racine_web  4 cms  5 base  6 php  7 taille_mo
 #   8 emails  9 dns_externe  10 sous_domaines  11 alias_dns  12 valeur
 #   13 risque  14 lune_cible  15 notes
@@ -26,7 +29,7 @@ set -uo pipefail
 cd -- "$(dirname -- "$0")" || exit 1
 . ./o2s-lib.sh
 
-CSV="../plan/inventaire.csv" FILTRE="" SRC_DEFAUT="webandseo"
+CSV="" FILTRE="" SRC_DEFAUT=""
 while [ $# -gt 0 ]; do
   case "$1" in
     --csv)   CSV="${2:-}";        shift 2 ;;
@@ -36,6 +39,12 @@ while [ $# -gt 0 ]; do
     *) die "option inconnue : $1" ;;
   esac
 done
+if [ -z "$CSV" ]; then
+  err "--csv est obligatoire. Feuilles disponibles :"
+  ls -1 ../plan/*/inventaire.csv 2>/dev/null | sed 's/^/      /' >&2 \
+    || echo "      (aucune trouvée dans ../plan/)" >&2
+  exit 1
+fi
 [ -r "$CSV" ] || die "feuille illisible : $CSV"
 
 # ------------------------------------------------------------- cohérence ----
@@ -94,6 +103,10 @@ awk -F',' -v filtre="$FILTRE" -v src="$SRC_DEFAUT" '
     dom=trim($1); cible=trim($14)
     if (dom=="" || cible=="") next
     src_user = (trim($2)=="" ? src : trim($2))
+    if (src_user == "") {
+      printf "  ignoré, compte source inconnu : %s (colonne lune_actuelle vide, et pas de --src-user)\n", dom > "/dev/stderr"
+      next
+    }
     if (cible == src_user) next          # ne bouge pas
     if (filtre != "" && cible != filtre) next
     # Priorité de passage : simple et léger avant complexe et lourd.

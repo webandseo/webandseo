@@ -96,9 +96,13 @@ un poste distant.
 Génère les commandes exactes plutôt que de les taper :
 
 ```sh
-./o2s-plan.sh --csv ../plan/inventaire.csv                      # les 18
-./o2s-plan.sh --csv ../plan/inventaire.csv --lune sc1webandseo  # une lune
+./o2s-plan.sh --csv ../plan/webandseo/inventaire.csv                     # les 18
+./o2s-plan.sh --csv ../plan/webandseo/inventaire.csv --lune sc1webandseo  # une lune
 ```
+
+**Attention à la feuille** : deux hébergements sont décrits dans `plan/`, se
+tromper viserait les mauvais comptes. `--csv` est devenu obligatoire pour cette
+raison — il n'y a plus de feuille par défaut.
 
 Le schéma est toujours le même :
 
@@ -315,7 +319,8 @@ d'attention.
 
 - Outillage et runbook détaillé : `o2switch/README.md` du dépôt
   `webandseo/webandseo`, branche `claude/o2switch-sites-distribution-f3ws7q`
-- Critères de répartition : `o2switch/plan/repartition.md`
+- Critères de répartition : `o2switch/plan/methode.md`
+- Répartition de ce compte : `o2switch/plan/webandseo/repartition.md`
 - Guide officiel o2switch :
   <https://faq.o2switch.fr/guides/migrations/deplacer-site-hebergement-o2switch/>
   — à recouper, il n'a pas pu être consulté lors de la préparation.

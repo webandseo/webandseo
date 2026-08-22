@@ -1,35 +1,6 @@
-# Répartition des 23 sites sur les lunes
+# Compte `webandseo` — répartition
 
-Document de travail. La méthode et les contraintes sont établies ; le tableau
-final attend la liste réelle des sites (voir « Ce qu'il me manque » en fin de
-page).
-
----
-
-## Ce qu'une lune protège, et ce qu'elle ne protège pas
-
-Une lune est un compte cPanel indépendant : système de fichiers séparé,
-utilisateur système distinct, ressources dédiées. Un WordPress compromis dans
-une lune ne donne pas accès aux fichiers des autres lunes. C'est exactement la
-réponse au risque décrit — aujourd'hui, une seule faille expose les 23 sites.
-
-Trois limites à garder en tête, pour ne pas se croire mieux protégé qu'on
-ne l'est :
-
-- **Le cloisonnement s'arrête à la lune.** Les sites d'une même lune restent
-  perméables entre eux. La question à se poser pour chaque groupe n'est donc
-  pas « ces sites se ressemblent-ils ? » mais **« suis-je prêt à les perdre
-  ensemble ? »**
-- **L'IP ne change pas.** Toutes les lunes partagent l'IP du serveur. Aucun
-  effet, ni positif ni négatif, sur l'empreinte SEO du réseau. Si la
-  diversification d'IP est un objectif à part, elle relève de l'option
-  ipXtender, pas des lunes.
-- **Le compte principal reste le plus sensible.** C'est de lui que se gèrent
-  les lunes. Le laisser **sans aucun site** est le meilleur usage qu'on puisse
-  en faire : plus rien à y compromettre. C'est bien ce que vise une répartition
-  23 sites → 5 lunes.
-
----
+Méthode et critères : `plan/methode.md`.
 
 ## Les espaces disponibles
 
@@ -79,44 +50,6 @@ Si le plan n'autorise que quatre lunes, la répartition ci-dessous reste
 valable : elle isole alors le groupe le plus fragile, ce qui est le meilleur
 usage possible de quatre espaces.
 
-## Critères de classement
-
-Deux notes par site, de 1 à 3. Elles se croisent, elles ne s'additionnent pas.
-
-**Valeur** — ce que coûterait la perte ou l'indisponibilité du site
-1. aucun revenu, aucun trafic, reconstructible en une journée
-2. trafic réel, revenus indirects, image
-3. revenus directs, clients, contenus non reproductibles
-
-**Risque** — la probabilité d'être le point d'entrée
-1. site sobre : peu de plugins, à jour, pas de compte utilisateur, pas de
-   formulaire d'upload
-2. site standard : une dizaine de plugins, mises à jour irrégulières
-3. site exposé : e-commerce ou paiement, comptes utilisateurs, extensions ou
-   thèmes hors dépôt officiel, version de PHP ou de WordPress ancienne, site
-   repris d'un tiers dont l'historique est inconnu
-
-La règle de placement en découle : **un site noté risque 3 ne partage jamais
-sa lune avec un site noté valeur 3.** Tout le reste est du remplissage.
-
----
-
-## Contraintes techniques à respecter
-
-- **Un sous-domaine reste sur la lune de son domaine principal.** Si
-  `boutique.exemple.fr` et `exemple.fr` existent tous les deux, ils sont
-  indissociables. À repérer avant de composer les groupes.
-- **Les domaines portant des boîtes email** demandent une bascule plus
-  soignée. Les regrouper permet de traiter cette difficulté en une fois.
-- **Un site accessible à un tiers** (client, prestataire, marque blanche) va
-  dans une lune où il est seul ou entouré d'autres sites du même tiers : c'est
-  le cas d'usage d'origine des lunes, on peut alors déléguer l'accès cPanel
-  sans exposer le reste.
-- **L'équilibrage disque et ressources** vient en dernier. Il n'entre en jeu
-  que si un site pèse à lui seul une part importante du quota.
-
----
-
 ## Répartition retenue
 
 Arrêtée par Maximilien. 23 sites, dont **18 à déplacer**.
@@ -162,30 +95,6 @@ retenu conserve 5 sites dessus.
   disparaît avec elle : à ressaisir sur `sc1webandseo`, dans l'Éditeur de zone
   uniquement — c'est un alias DNS, pas un sous-domaine cPanel.
 - **Aucun autre sous-domaine** parmi les 18 sites à déplacer.
-
-## Générer les commandes
-
-Une fois `inventaire.csv` rempli, `bin/o2s-plan.sh` en tire les commandes de
-chaque site, dans l'ordre de passage conseillé :
-
-```sh
-./o2s-plan.sh --csv ../plan/inventaire.csv                  # tout
-./o2s-plan.sh --csv ../plan/inventaire.csv --lune sc3webandseo   # une lune
-```
-
-Il contrôle aussi la cohérence du plan et signale les regroupements
-dangereux — un site noté risque 3 partageant sa lune avec un site noté
-valeur 3 — ainsi que les sites encore sans lune cible.
-
-## Feuille d'inventaire
-
-`plan/inventaire.csv` est une trame à remplir. Le plus rapide est de la
-générer plutôt que de la saisir : lancez `o2s-inventaire.sh` sur le compte
-principal, il produit un `sites.tsv` qui contient déjà domaines, racines,
-bases, versions de PHP et tailles. Il ne reste qu'à ajouter les deux notes et
-la lune cible.
-
----
 
 ## Suite
 
