@@ -8,10 +8,10 @@ cloisonner.
 
 **20 sites sont à déplacer.** Les 5 autres restent où ils sont.
 
-C'est la même opération que sur le compte `webandseo`, avec le même outillage.
-Une différence de taille : **sur ce compte, on ne sait encore rien des
-particularités** — emails, sous-domaines, DNS externes, CDN. L'inventaire n'est
-donc pas une formalité, c'est ce qui déterminera la procédure de chaque site.
+C'est la même opération que sur le compte `webandseo`, menée à son terme, avec
+le même outillage. Et elle est plus simple : **aucun sous-domaine, aucune boîte
+email, aucun cas particulier.** 20 sites ordinaires, la même séquence répétée
+vingt fois.
 
 ## Répartition à appliquer
 
@@ -23,17 +23,9 @@ donc pas une formalité, c'est ce qui déterminera la procédure de chaque site.
 | `sc3qvle6290` | `ismap.fr`, `leblogcbd.fr`, `logiciel-emailing.net`, `mes-vacances-scolaires.fr`, `metaux.xyz` | 5 migrations |
 | `sc4qvle6290` | `oglinks.com`, `peintremik-art.com`, `platomic.com`, `prixdesmetaux.fr`, `vetementsminceur.com` | 5 migrations |
 
-Répartition arrêtée. Ne la modifie pas de ta propre initiative : si l'inventaire
-fait apparaître un problème (voir « Quand t'arrêter »), remonte-le.
+Répartition arrêtée. Ne la modifie pas de ta propre initiative.
 
-## Étape 0 — inventaire, et c'est un point d'arrêt
-
-Quatre inconnues conditionnent la procédure de chaque site :
-
-- quels domaines portent des **boîtes email** ;
-- lesquels ont des **sous-domaines** ;
-- lesquels utilisent des **DNS externes** (Cloudflare, registrar) ;
-- lesquels passent par un **CDN** ou un autre alias DNS.
+## Étape 0 — inventaire
 
 En SSH sur `qvle6290` :
 
@@ -42,14 +34,13 @@ En SSH sur `qvle6290` :
     hostname -f          # relève le serveur de ce compte, il servira plus bas
     ./o2s-inventaire.sh
 
-Le script est en lecture seule. **Remonte le `sites.tsv` et le nom du serveur
-avant de démarrer la première migration**, et attends le feu vert : c'est à ce
-moment que la feuille `plan/qvle6290/inventaire.csv` sera complétée, et donc que
-les commandes générées seront justes.
+Le script est en lecture seule. Il donne le poids, la base, la version de PHP
+et la racine web de chaque site — de quoi établir l'ordre de passage, du plus
+léger au plus lourd.
 
-Une piste à vérifier dès l'inventaire : `logiciel-emailing.net` traite
-d'emailing. Un site de cette thématique porte souvent une configuration SPF,
-DKIM et DMARC soignée. Regarde son relevé DNS de près.
+**Remonte le `sites.tsv` et le nom du serveur avant de démarrer**, puis
+complète `plan/qvle6290/inventaire.csv` avec les tailles : c'est ce qui rend
+juste l'ordre proposé par le générateur de commandes.
 
 ## Ce qui est automatisé, et ce qui ne l'est pas
 
@@ -97,8 +88,6 @@ comptes.**
     ./o2s-plan.sh --csv ../plan/qvle6290/inventaire.csv                     # les 20
     ./o2s-plan.sh --csv ../plan/qvle6290/inventaire.csv --lune sc1qvle6290  # une lune
 
-Le schéma est toujours le même :
-
 **La veille — aucune coupure, le site tourne**
 
     ./o2s-verif.sh  --domaine SITE --snapshot avant
@@ -123,7 +112,8 @@ Puis dans cPanel, dans cet ordre :
 1. `qvle6290` → `Domaines` → SITE → **Supprimer**
 2. LUNE → `Domaines` → **Créer un domaine**, racine `/home/LUNE/SITE`
 3. LUNE → `Éditeur de zone` → ressaisir les enregistrements relevés
-4. LUNE → `SSL/TLS Status` → **Exécuter AutoSSL**
+4. LUNE → `Sécurité` → **`Let's Encrypt™ SSL`** → **Générer** le certificat
+   (voir la section suivante, c'est l'étape à ne pas repousser)
 
 **Puis, sur la lune**
 
@@ -133,44 +123,79 @@ Puis dans cPanel, dans cet ordre :
 
 Le relevé « après » est comparé au « avant » et n'affiche que les écarts.
 
-## Les quatre pièges
+## Les certificats SSL — à faire dans la foulée, pas plus tard
 
-Les quatre s'appliquent ici, sans exception connue à ce stade.
+**Un certificat appartient au compte cPanel, il ne suit pas le domaine.** Dès
+que le site est ajouté sur la lune, il n'a plus aucun certificat valide : le
+navigateur affiche un avertissement de sécurité en pleine page.
 
-**1. Retirer un domaine détruit sa zone DNS.** En le recréant sur la lune,
-cPanel régénère une zone *par défaut* : MX, SPF, DKIM, DMARC, CAA,
-vérifications de propriété et CNAME disparaissent. Le piège, c'est que **le site
-remarche normalement** — la panne se manifeste deux heures plus tard, quand les
-emails cessent de partir. `o2s-dns-save.sh` relève la zone avant l'opération (la
-phase `precopy` le fait automatiquement). Sans objet pour les domaines en DNS
-externe.
+Et c'est pire que « le site n'est pas en HTTPS ». La quasi-totalité des
+WordPress forcent HTTPS, par `.htaccess` ou par extension — et ce `.htaccess`
+a voyagé avec les fichiers. Le site redirige donc vers un HTTPS cassé :
+**concrètement il est inaccessible**, pas simplement dégradé. Génère le
+certificat immédiatement après avoir ajouté le domaine, pas en fin de journée.
 
-**2. Le certificat SSL ne suit pas.** Il appartient au compte cPanel. Lance
-AutoSSL immédiatement après avoir ajouté le domaine. Si le site est derrière
-Cloudflare en mode proxy, passe-le en `DNS only` le temps de la validation.
+### La marche à suivre
 
-**3. Les emails ne se déplacent pas seuls.** Si l'inventaire révèle des boîtes,
-elles sont à recréer sur la lune, puis deux répertoires à transférer :
-`mail/SITE` (contenu des boîtes) et `etc/SITE` (configurations et mots de
-passe). Bascule à heure creuse : les messages entrants peuvent être rejetés
-pendant la fenêtre.
+Sur la lune de destination : `Sécurité` → **`Let's Encrypt™ SSL`** → repérer le
+domaine dans la liste → **Générer**.
 
-Et même sans boîte : l'absence de boîtes ne veut pas dire que la zone ne
-contient ni MX, ni SPF, ni DKIM, ni DMARC. Ces enregistrements servent au
-courrier sortant — formulaires de contact, notifications WordPress. Ressaisis
-tout ce que le relevé montre, sans trier.
+Trois points de vigilance :
 
-**4. Un sous-domaine ne peut pas quitter son domaine principal.** Il reste sur
-la même lune, obligatoirement. Et surtout : **supprimer un domaine supprime tous
-ses sous-domaines avec lui.** Si l'inventaire en révèle, ils doivent être
-pré-copiés et recréés eux aussi, sous peine de disparaître.
+- **Coche `domaine.tld` et `www.domaine.tld`.** Un certificat qui ne couvre que
+  l'un des deux laisse l'autre en erreur, et les visiteurs arrivent sur les deux.
+- **Décoche les sous-domaines techniques** — tout ce qui se termine par
+  `.odns.fr`, `.o2switch.net` ou `.universe.wf`. o2switch le documente
+  explicitement : leur présence fait **échouer la demande entière**, et l'échec
+  n'est pas toujours lisible.
+- **Ne compte pas sur AutoSSL pour aller vite.** o2switch finit par installer
+  un Let's Encrypt automatiquement sur tous les domaines, mais il attend la
+  propagation DNS et peut mettre des heures. Sur une bascule, la génération
+  manuelle est immédiate : c'est elle qu'on veut.
 
-Ne confonds pas un sous-domaine avec un **alias DNS**. Un sous-domaine a une
-racine web : il se migre et se recrée dans `Domaines`. Un alias — un CNAME de
-CDN, par exemple — n'a pas de racine : il se ressaisit uniquement dans
-l'**Éditeur de zone**. Le créer comme sous-domaine produirait un enregistrement
-A qui empêcherait le CNAME d'exister, et le CDN serait contourné sans que rien
-n'ait l'air cassé.
+L'émission demande que le domaine résolve déjà vers le serveur. C'est le cas
+tout de suite ici : l'IP ne change pas d'un compte à l'autre, seul le compte
+propriétaire change. Aucune attente de propagation à prévoir.
+
+Les certificats Let's Encrypt sont valables 90 jours et o2switch les renouvelle
+ensuite automatiquement. Rien à planifier de ce côté.
+
+### Contrôle de fin de campagne
+
+Une fois les 20 sites déplacés, vérifie qu'aucun certificat n'est passé à la
+trappe. Depuis n'importe quel compte :
+
+    for d in $(awk -F, 'NR>1 && $14 ~ /^sc/ {print $1}' ../plan/qvle6290/inventaire.csv); do
+      printf '%-32s ' "$d"
+      echo | openssl s_client -servername "$d" -connect "$d:443" 2>/dev/null \
+        | openssl x509 -noout -issuer -enddate 2>/dev/null || echo "AUCUN CERTIFICAT"
+    done
+
+Les 20 lignes doivent afficher un émetteur Let's Encrypt et une date
+d'expiration à environ 90 jours. Toute ligne vide ou marquée `AUCUN CERTIFICAT`
+est un site en erreur de sécurité pour ses visiteurs : à traiter tout de suite.
+
+## Les autres pièges
+
+**Retirer un domaine détruit sa zone DNS.** C'est le piège principal, et il
+reste entier. En recréant le domaine sur la lune, cPanel régénère une zone *par
+défaut* : tout ce qui avait été ajouté à la main disparaît — SPF, DKIM, DMARC,
+CAA, vérifications de propriété, CNAME. Le piège, c'est que **le site remarche
+normalement** : rien ne signale la perte.
+
+L'absence de boîtes email ne met pas à l'abri. Un site sans boîte peut très bien
+avoir un SPF et un DKIM, qui servent au courrier **sortant** — formulaires de
+contact, notifications WordPress, mails transactionnels. Les perdre, c'est voir
+ces messages finir en spam, sans erreur visible nulle part.
+
+`o2s-dns-save.sh` relève la zone avant l'opération, et la phase `precopy` le
+fait automatiquement. **Ressaisis tout ce que le relevé montre, sans trier.**
+
+**Deux garde-fous, même s'ils ne devraient pas servir ici.** Il a été confirmé
+qu'aucun de ces 25 domaines n'a de sous-domaine ni de boîte email. Si
+l'inventaire en révèle malgré tout un, arrête-toi : supprimer un domaine
+supprime tous ses sous-domaines avec lui, et une boîte email demande de
+transférer `mail/SITE` et `etc/SITE` en plus du reste.
 
 ## Règles de sûreté
 
@@ -183,21 +208,17 @@ n'ait l'air cassé.
 - Les scripts **simulent par défaut**. Lance chaque commande une première fois
   sans `--go` et lis ce qu'elle annonce avant d'exécuter.
 - **Ne fais pas le ménage sur `qvle6290`** avant plusieurs jours de
-  fonctionnement normal, emails et tâches cron vérifiés.
+  fonctionnement normal, tâches cron vérifiées.
 - `--reecrire-chemins` exige `--src-user qvle6290`. Ne le retire pas.
 
 ## Ordre d'exécution
 
-1. **L'inventaire, et tu t'arrêtes.** Attends le feu vert avant toute migration :
-   la feuille doit d'abord être complétée avec ce que tu auras trouvé.
-2. **Un seul site ensuite**, le plus léger sans email, sans sous-domaine et sans
-   DNS externe. Il valide la clé SSH, la bascule, AutoSSL, et donne le vrai
-   chronomètre. Compte une heure. **Arrête-toi là aussi et fais un point.**
-3. Puis les sites ordinaires, du plus léger au plus lourd. 15 à 20 minutes
-   chacun une fois la procédure rodée.
-4. Ceux qui portent des emails, un sous-domaine, un CDN ou une zone DNS chargée
-   en dernier, à heure creuse, un ou deux par jour avec un contrôle le
-   lendemain.
+1. **Un seul site d'abord**, le plus léger d'après l'inventaire. Il valide la
+   clé SSH, la bascule, la génération du certificat, et donne le vrai
+   chronomètre. Compte une heure. **Arrête-toi là et fais un point.**
+2. Ensuite les 19 autres, du plus léger au plus lourd. 15 à 20 minutes chacun
+   une fois la procédure rodée.
+3. Les plus visités en dernier, à heure creuse.
 
 N'enchaîne pas les 20 d'un bloc. Chaque bascule mérite ses quinze minutes
 d'attention.
@@ -206,24 +227,20 @@ d'attention.
 
 - Recréer les **tâches cron** relevées (`~/o2s-migration/SITE/crontab-source.txt`)
 - Vérifier la **version de PHP** et ses extensions sur la lune
-- Purger les caches du site et d'un éventuel CDN
+- Purger les caches du site
 - Contrôler la Search Console et les logs d'erreur à 24 h
 
 ## Quand t'arrêter et demander
 
-- **Après l'inventaire**, systématiquement.
-- Un site a des **sous-domaines** : la répartition n'en tient pas compte,
-  remonte-le avant de déplacer le domaine parent.
-- Un site porte des **boîtes email** avec un historique à conserver : confirme
-  la fenêtre de bascule avant de lancer.
-- Un site passe par un **CDN** ou porte un **alias DNS** : signale-le, le CNAME
-  devra être ressaisi et le cache purgé.
+- L'inventaire révèle un **sous-domaine** ou une **boîte email** : cela
+  contredit ce qui a été confirmé, arrête-toi.
+- Un certificat Let's Encrypt **refuse d'être généré** après deux tentatives :
+  ne laisse pas le site en erreur de sécurité, remonte-le.
+- `o2s-verif.sh --snapshot apres` signale un **SPF, DKIM, DMARC ou MX disparu** :
+  corrige immédiatement dans l'Éditeur de zone, avant de passer au site suivant.
 - L'inventaire révèle un site **nettement plus gros ou plus sensible** que ses
   voisins de lune : la répartition a été faite par ordre alphabétique, sans
   critère de risque.
-- `o2s-verif.sh --snapshot apres` signale un **MX, SPF, DKIM, DMARC ou CNAME
-  disparu** : corrige immédiatement dans l'Éditeur de zone, avant de passer au
-  site suivant.
 - La connexion SSH entre comptes ne s'établit ni par `localhost` ni par le nom
   du serveur : ne cherche pas de contournement, remonte-le.
 
@@ -233,6 +250,7 @@ d'attention.
   toute migration
 - Après le premier site : le temps réel, et ce qui a coincé
 - Après chaque site : la sortie de `o2s-verif.sh --snapshot apres`
+- **Le contrôle SSL de fin de campagne**, les 20 lignes
 - Un point global une fois les 20 faits, avec ce qui reste à finir
 
 ## Références
@@ -243,5 +261,6 @@ Dépôt `webandseo/webandseo`, branche `claude/o2switch-sites-distribution-f3ws7
 - `o2switch/plan/methode.md` — critères de répartition
 - `o2switch/plan/qvle6290/repartition.md` — la répartition de ce compte
 
-Guide officiel o2switch, à recouper :
-<https://faq.o2switch.fr/guides/migrations/deplacer-site-hebergement-o2switch/>
+Documentation o2switch :
+[Let's Encrypt, certificat SSL gratuit](https://faq.o2switch.fr/cpanel/securite/lets-encrypt-ssl-gratuit/) ·
+[Déplacer un site d'un hébergement à un autre](https://faq.o2switch.fr/guides/migrations/deplacer-site-hebergement-o2switch/)

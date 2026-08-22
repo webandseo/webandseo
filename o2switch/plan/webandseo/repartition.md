@@ -1,5 +1,8 @@
 # Compte `webandseo` — répartition
 
+> **Migration effectuée.** Les 18 sites ont été déplacés. Ce document est
+> conservé comme trace de ce qui a été appliqué.
+
 Méthode et critères : `plan/methode.md`.
 
 ## Les espaces disponibles

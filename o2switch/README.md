@@ -63,9 +63,14 @@ l'opération, par trois canaux indépendants.
 registrar) : la zone o2switch n'est alors pas utilisée.*
 
 **2. Le certificat SSL ne suit pas.** Le certificat appartient au compte
-cPanel. Après la bascule, le domaine n'en a plus. Lancez AutoSSL sur la lune
-de destination dans la foulée (`SSL/TLS Status` → `Run AutoSSL`) : quelques
-minutes, pendant lesquelles HTTPS est en erreur. Si le domaine est derrière
+cPanel. Après la bascule, le domaine n'en a plus — et comme la plupart des
+sites forcent HTTPS par `.htaccess`, qui a voyagé avec les fichiers, le site
+n'est pas seulement dégradé : il est inaccessible. Générez le certificat
+immédiatement, par `Sécurité` → `Let's Encrypt™ SSL` → `Générer`, en cochant
+le domaine **et** son `www`, et en décochant les sous-domaines techniques
+(`.odns.fr`, `.o2switch.net`, `.universe.wf`) dont la présence fait échouer la
+demande entière. AutoSSL finit par le faire seul, mais il attend la
+propagation DNS et peut mettre des heures. Si le domaine est derrière
 Cloudflare en mode proxy, passez-le temporairement en `DNS only`, sans quoi
 la validation HTTP-01 peut échouer.
 

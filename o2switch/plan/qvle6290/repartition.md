@@ -41,23 +41,20 @@ coûte le même effort qu'une migration initiale.
 **Cinq sites restent sur le compte principal**, celui depuis lequel se gèrent
 les lunes.
 
-### Ce qu'on ne sait pas encore
+### Particularités : aucune
 
-Contrairement au compte `webandseo`, aucune particularité n'a encore été
-relevée ici. Les quatre points suivants sont **inconnus** et conditionnent la
-procédure de bascule, pas la répartition :
+Confirmé pour les 25 domaines : **aucun sous-domaine, aucune boîte email,
+aucun cas particulier.** Ni CDN, ni alias DNS, ni DNS externe signalé. C'est
+vingt fois la même séquence, sans exception à traiter.
 
-- quels domaines portent des **boîtes email** ;
-- lesquels ont des **sous-domaines** — un sous-domaine ne peut pas quitter son
-  domaine principal, et supprimer un domaine emporte tous les siens ;
-- lesquels utilisent des **DNS externes** (Cloudflare, registrar) plutôt que
-  ceux d'o2switch ;
-- lesquels passent par un **CDN** ou tout autre alias DNS.
+Deux conséquences pratiques :
 
-C'est l'objet de l'inventaire préalable, qui est un point d'arrêt obligatoire
-dans l'ordre de mission.
-
-Un seul soupçon, à vérifier : `logiciel-emailing.net` traite d'emailing. Un
-site de cette thématique a de bonnes chances de porter une configuration SPF,
-DKIM et DMARC soignée, voire d'envoyer réellement du courrier. À regarder de
-près dans le relevé DNS avant de le basculer.
+- La zone DNS reste malgré tout à restaurer intégralement après chaque bascule.
+  L'absence de boîte email n'implique pas l'absence de SPF ou de DKIM : ces
+  enregistrements servent au courrier **sortant** des sites, et les perdre fait
+  finir en spam les notifications et les formulaires de contact, sans erreur
+  visible.
+- Les **certificats Let's Encrypt** sont à générer sur la lune juste après
+  l'ajout de chaque domaine. Un certificat appartient au compte cPanel et ne
+  suit pas le domaine ; comme les sites forcent HTTPS par `.htaccess`, un
+  domaine sans certificat n'est pas dégradé mais inaccessible.

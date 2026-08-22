@@ -168,7 +168,7 @@ awk -F',' -v filtre="$FILTRE" -v src="$SRC_DEFAUT" '
     printf '#     -> alias DNS, PAS un sous-domaine cPanel. Le créer comme\n'
     printf '#        sous-domaine produirait un A qui empêcherait le CNAME.\n'
   done
-  printf '#   SSL/TLS Status de %s  : Exécuter AutoSSL' "$cible"
+  printf '#   Sécurité > Let\x27s Encrypt SSL de %s : Générer pour le domaine + www' "$cible"
   [ -n "$sous" ] && printf '  (vérifier la couverture des sous-domaines)'
   printf '\n'
 
