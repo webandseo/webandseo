@@ -1,5 +1,9 @@
 # Compte `qvle6290` — répartition
 
+> **Migration effectuée.** Les 20 sites ont été déplacés et leurs certificats
+> Let's Encrypt générés. Ce document est conservé comme trace de ce qui a été
+> appliqué.
+
 Méthode et critères : `plan/methode.md`.
 
 ## Les espaces disponibles
