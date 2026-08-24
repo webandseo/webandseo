@@ -233,10 +233,19 @@ fonctionnement normal, une fois les emails et les tâches planifiées vérifiés
 Le runbook et l'outillage sont génériques ; chaque hébergement a son dossier.
 
     plan/methode.md    critères de répartition, indépendants du compte
-    plan/webandseo/    compte webandseo — 23 sites, 18 migrations  (effectuée)
-    plan/qvle6290/     compte qvle6290  — 25 sites, 20 migrations  (effectuée)
-    plan/trlh2564/     compte trlh2564  — 23 sites, 19 migrations  (effectuée)
+    plan/webandseo/    compte webandseo — 23 sites, 18 migrations
+    plan/qvle6290/     compte qvle6290  — 25 sites, 20 migrations
+    plan/trlh2564/     compte trlh2564  — 23 sites, 19 migrations
     plan/elyes7/       compte elyes7    — 10 sites,  8 migrations
+
+**Les quatre campagnes sont terminées** : 81 sites, 65 déplacés sur 16 lunes,
+16 restés sur leur compte principal. Les documents de chaque hébergement sont
+conservés comme trace de ce qui a été appliqué.
+
+L'outillage reste utilisable tel quel pour tout déplacement ultérieur : il
+prend les comptes en paramètre et ne suppose rien de l'hébergement. Pour un
+nouveau compte, ajoutez un dossier `plan/<compte>/` sur le modèle des quatre
+existants.
 
 Chaque dossier contient `repartition.md` (la répartition retenue),
 `inventaire.csv` (la feuille de travail) et `mission-hermes.md` (l'ordre de
