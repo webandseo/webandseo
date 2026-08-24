@@ -235,7 +235,8 @@ Le runbook et l'outillage sont génériques ; chaque hébergement a son dossier.
     plan/methode.md    critères de répartition, indépendants du compte
     plan/webandseo/    compte webandseo — 23 sites, 18 migrations  (effectuée)
     plan/qvle6290/     compte qvle6290  — 25 sites, 20 migrations  (effectuée)
-    plan/trlh2564/     compte trlh2564  — 23 sites, 19 migrations
+    plan/trlh2564/     compte trlh2564  — 23 sites, 19 migrations  (effectuée)
+    plan/elyes7/       compte elyes7    — 10 sites,  8 migrations
 
 Chaque dossier contient `repartition.md` (la répartition retenue),
 `inventaire.csv` (la feuille de travail) et `mission-hermes.md` (l'ordre de
