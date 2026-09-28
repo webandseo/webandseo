@@ -37,12 +37,12 @@ J’édite et monétise des sites, j’accompagne des projets en SEO (on‑site,
 ---
 
 ### Accompagnement
-- [Réserver une séance de coaching](https://tidycal.com/maximilien/) : 60 minutes en visio pour avancer sur votre SEO, l’IA, l’affiliation ou votre stratégie web.
+- [Réserver une séance de coaching](https://tidycal.com/maximilien/) : 30 ou 60 minutes en visio pour avancer sur votre SEO, l’IA, l’affiliation ou votre stratégie web.
 
 ---
 
 ## Où me suivre
-- Profil X : [@maximilien912 - Twitter](https://x.com/maximilien912)  
+- Profil X : [@maximilien912 - X](https://x.com/maximilien912)  
 - Profil LinkedIn : [Maximilien Labadie - Linkedin](https://www.linkedin.com/in/mlabadie/)  
 - Chaîne YouTube : [Maximilien Labadie - Web & SEO](https://www.youtube.com/c/MaximilienLabadie-WebandSEO)  
 - S’abonner à la [Newsletter Web & SEO](https://www.webandseo.net/)
