@@ -29,14 +29,15 @@ J’édite et monétise des sites, j’accompagne des projets en SEO (on‑site,
 
 ---
 
-### Formation et accompagnement
-- [Académie Web & SEO](https://www.webandseo.fr/academie/) : formation et accompagnement pour vivre de l’affiliation.  
-  - [Formation Affiliation & Site de Niche](https://www.webandseo.fr/academie/produit/site-de-niche/)  
-  - [Site d’affiliation clé en main](https://www.webandseo.fr/academie/produit/site-cle-en-main/)  
-  - [Coaching Web & SEO](https://www.webandseo.fr/academie/produit/coaching/)
+### Plugins WordPress
+- [Web & SEO Plugins](https://webandseo.dev/) - mes plugins WordPress pour éditeurs de sites :
+  - [Unstale](https://unstale.ai/) : plugin gratuit qui vérifie, met à jour et republie vos anciens articles sans toucher aux URL.
+  - [Web & SEO Autolinker](https://autolinker.app/) : maillage interne automatique entre vos contenus, à partir des ancres déjà présentes dans vos textes.
 
-- [Mon Site de Niche](https://monsitedeniche.com/) : démarrer un site de niche avec services associés (contenu, optimisations, netlinking, UX).  
-  En savoir plus : [À propos de Mon Site de Niche](https://monsitedeniche.com/a-propos/)
+---
+
+### Accompagnement
+- [Réserver une séance de coaching](https://tidycal.com/maximilien/) : 60 minutes en visio pour avancer sur votre SEO, l’IA, l’affiliation ou votre stratégie web.
 
 ---
 
@@ -50,8 +51,7 @@ J’édite et monétise des sites, j’accompagne des projets en SEO (on‑site,
 
 ## Liens utiles
 - [Linktree](https://linktr.ee/webseofr)
-- [Solo.to](https://solo.to/webandseo)  
-- [Bento.me](https://bento.me/webandseo)  
+- [Solo.to](https://solo.to/webandseo)
 - [CodePen](https://codepen.io/Maximilien-Labadie/full/ZYbxgzy)
 
 <!---
